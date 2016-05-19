@@ -36,7 +36,7 @@ var onPageLoad = function(tabId, changeInfo, tab) {
         if (tab.openerTabId != null) {
             pageData["referrerUrl"] = sessionHistory[tab.openerTabId];
         }
-        console.log(pageData);
+        // console.log(pageData);
     }
 }
 
@@ -44,6 +44,15 @@ var onPageClosed = function (tabId) {
     delete sessionHistory[tabId];
 }
 
+var onStateChanged = function (newState) {
+    console.log(newState);
+}
+
+// Tabs events
+
 chrome.tabs.onRemoved.addListener(onPageClosed);
 chrome.tabs.onUpdated.addListener(onPageLoad);
+
+// State events
+chrome.idle.onStateChanged.addListener(onStateChanged);
 
