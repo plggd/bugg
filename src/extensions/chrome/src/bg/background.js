@@ -1,4 +1,3 @@
-
 // chores
 
 function log(message, value) {
@@ -11,8 +10,8 @@ function isExists(value) {
     return (value != null);
 }
 
-function getDomain(url){
-    var domain=url.split("//")[1];
+function getDomain(url) {
+    var domain = url.split("//")[1];
     return domain.split("/")[0];
 }
 
@@ -20,7 +19,7 @@ function getDomain(url){
 
 var sessionHistory = {};
 
-var getPageData = function(tab) {
+var getPageData = function (tab) {
     return {
         url: tab.url,
         domain: getDomain(tab.url),
@@ -33,15 +32,15 @@ var getPageData = function(tab) {
     };
 }
 
-var onPageLoad = function(tabId, changeInfo, tab) {
+var onPageLoad = function (tabId, changeInfo, tab) {
     if (isExists(changeInfo["status"]) && changeInfo["status"] == "complete") {
 
         var pageData = getPageData(tab);
         if (isExists(tab.openerTabId)) { // open in a new tab
-            pageData["referrer"] = { "url" : sessionHistory[tab.openerTabId] };
+            pageData["referrer"] = {"url": sessionHistory[tab.openerTabId]};
         }
         else if (isExists(sessionHistory[tabId])) {  // opened in the same tab
-            pageData["referrer"] = { "url" : sessionHistory[tabId] };
+            pageData["referrer"] = {"url": sessionHistory[tabId]};
         }
 
         if (isExists(pageData["referrer"])) {
@@ -62,7 +61,23 @@ var onStateChanged = function (newState) {
     log("activity", newState);
 }
 
-// events
+var onGoogleRequest = function (request) {
+    //var url = new URL(request.url);
+    //var params = new URLSearchParams(url.search.slice(1));
+    //var actualUrl = params.get("url");
+    //return {redirectUrl: actualUrl};
+    return {cancel: true}; // cancel the call
+}
+
+/// events
+
+// request : google - remove search result redirects
+
+chrome.webRequest.onBeforeRequest.addListener(
+    onGoogleRequest,
+    {urls: ["*://*.google.com/url*"]},
+    ["blocking"]
+);
 
 // tabs
 
